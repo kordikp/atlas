@@ -32,14 +32,10 @@ h1{font:600 clamp(32px,4.6vw,52px)/1 var(--serif);margin:0;letter-spacing:-.015e
 .tiny{font-size:12px;margin:8px 0 0}
 @media (max-width:760px){.ctas{grid-template-columns:1fr;width:100%}}
 @media (min-width:1000px){
- .top{display:grid;justify-items:center;text-align:center;gap:14px;padding-block:24px 16px}
- .top .tag{margin-inline:auto;max-width:70ch;text-wrap:balance}
- .figs{justify-content:center;gap:6px 28px}
- .ctas{grid-template-columns:repeat(2,minmax(0,1fr));width:min(100%,1180px);text-align:left;gap:14px}
- .ctacard{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 20px;align-items:center;padding:12px 16px}
- .ctacard>*{grid-column:1}.ctacard p.small{margin:0}.ctacard .tiny{margin:4px 0 0}
- .ctacard .row{grid-column:2;grid-row:1 / span 3;flex-direction:column;align-items:stretch;flex-wrap:nowrap}
- .ctacard .row>*{text-align:center}
+ .top{align-items:center;padding-block:20px 14px}
+ .top>div:first-child{flex:1 1 440px;min-width:0}
+ .ctas{flex:0 1 820px;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .ctacard{padding:12px 16px}.ctacard p.small{text-wrap:pretty}
 }
 .layout{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
 @media (min-width:1000px){.layout{grid-template-columns:minmax(0,1fr) 400px}}
@@ -130,7 +126,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
       <p class="label">Atlas colab</p>
       <p class="small">Discuss the open problems, tell us if your paper sits in the wrong region, and answer the questions we have for your work.</p>
       <div class="row"><a class="btn" id="joinTop" href="#" target="_blank" rel="noopener">Join the colab</a><button class="au small" data-why="colab">Why join?</button></div>
-      <p class="tiny muted">Sign in with a GitHub account. No account? <a href="https://github.com/signup" target="_blank" rel="noopener">Create one free</a> in a minute.</p>
+      <p class="tiny muted">Sign in with GitHub. No account? <a href="https://github.com/signup" target="_blank" rel="noopener">Create one free</a>.</p>
     </div>
   </div>
 </div>

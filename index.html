@@ -162,7 +162,8 @@ const EXPLORE = 'https://recsys-atlas-explore.vercel.app';
 const REPO = 'https://github.com/kordikp/atlas';
 const COLAB = 'https://recsys-atlas-colab.vercel.app';
 const colab = slug => `${COLAB}/api/auth/github?next=${encodeURIComponent(slug ? '/d/' + slug : '/course')}`;
-const BOARD = { problems: 'tini--atlas-open-problems--lecture-01', questions: 'tini--atlas-author-questions--lecture-02', regions: 'tini--atlas-regions--lecture-03', data: 'tini--atlas-datasets--lecture-04' };
+const BOARD = { problems: 'tini--atlas-open-problems--lecture-01', data: 'tini--atlas-datasets--lecture-04' };
+const cont = g => g && g !== 'community' ? `tini--atlas-${g}--continent` : BOARD.problems;
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -419,7 +420,7 @@ function openRegion(id) {
     ${tps.length ? `<h3>Open problems here</h3><ul class="list">${tps.map(([t, j]) => `<li><span class="tagp">${esc(TP[j].readiness?.level)}</span> <button class="lk" data-t="${j}">${esc(TP[j].title)}</button></li>`).join('')}</ul>` : ''}
     <h3>Most cited</h3><ul class="list">${top.map(p => `<li><button class="lk" data-p="${p.i}">${esc(p.t)}</button><div class="small muted">${p.y} · ${p.c} citations</div></li>`).join('')}</ul>
     ${new26.length ? `<h3>New at RecSys 2026</h3><ul class="list">${new26.map(p => `<li><button class="lk" data-p="${p.i}">${esc(p.t)}</button><div class="small muted">${esc(p.tr)}</div></li>`).join('')}</ul>` : ''}
-    <p><a class="btn sec" href="${colab(BOARD.regions)}" target="_blank" rel="noopener">Discuss this region in the Atlas colab</a> <a class="btn sec" href="${colab(BOARD.data)}" target="_blank" rel="noopener">Datasets &amp; benchmarks</a></p>
+    <p><a class="btn sec" href="${colab(cont(r.group))}" target="_blank" rel="noopener">Discuss this region in the Atlas colab</a> <a class="btn sec" href="${colab(BOARD.data)}" target="_blank" rel="noopener">Datasets &amp; benchmarks</a></p>
     <p class="note">Closest topics in our taxonomy: ${esc([r.label, ...r.also].join(' · '))}. Region boundaries are machine-drafted; wrong neighbourhood? Tell us from the paper's panel.</p><button class="btn sec" data-go="home">Back</button>`;
 }
 function openTopic(j) {
@@ -453,7 +454,7 @@ function openPaper(i) {
     ${tps.length ? `<p class="small">Related open problem${tps.length > 1 ? 's' : ''}: ${tps.map(j => `<button class="au" data-t="${j}">${esc(TP[j].title)}</button>`).join(' · ')}</p>` : ''}
     <h3>Questions for the authors</h3><p class="small muted">${p.y === 2026 ? 'Drafted by an AI model from the abstract, to validate the record and help prioritise research.' : 'Help us keep the map current.'} Answer any, skip any.</p>
     ${qs.map((q, k) => `<div class="q"><p><span class="label">${esc(q.kind)}</span><br>${esc(q.q)}</p>${db ? `<textarea data-k="${k}" placeholder="Your answer (optional)"></textarea>` : ''}</div>`).join('')}
-    ${db ? `<div class="row"><button class="btn" id="sa">Save answers</button></div>` : `<a class="btn" href="${colab(p.y === 2026 ? BOARD.questions : BOARD.regions)}" target="_blank" rel="noopener">${p.y === 2026 ? 'Answer in the Atlas colab' : 'Discuss in the Atlas colab'}</a>`}
+    ${db ? `<div class="row"><button class="btn" id="sa">Save answers</button></div>` : `<a class="btn" href="${colab(cont(R[p.r].group))}" target="_blank" rel="noopener">${p.y === 2026 ? 'Answer in the Atlas colab' : 'Discuss in the Atlas colab'}</a>`}
     ${sample ? `<h3>Does a frontier model know this paper?</h3><p class="small muted">A Claude model describes it from memory, with no search. You mark each statement.</p><button class="btn sec" id="ask">Ask the model</button><div id="ans"></div>` : ''}
     <p><button class="btn sec" data-go="home" style="margin-top:12px">Back</button></p>`;
   const sa = $('#sa'); if (sa) sa.onclick = async () => { const a = [...$('#pc').querySelectorAll('textarea[data-k]')].map((x, k) => ({ kind: qs[k].kind, q: qs[k].q, a: x.value.trim() })).filter(x => x.a); if (!a.length) return toast('Write at least one answer.'); const ok = await save('answers', { paper: p.t, year: p.y, answers: a }); toast(ok ? 'Saved. Thank you.' : 'Could not save.'); if (ok) sa.disabled = true };

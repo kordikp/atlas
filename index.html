@@ -26,6 +26,11 @@ h1{font:600 clamp(32px,4.6vw,52px)/1 var(--serif);margin:0;letter-spacing:-.015e
 .tag{margin:6px 0 0;color:var(--ink-2);max-width:62ch;font-size:16px}
 .figs{display:flex;flex-wrap:wrap;gap:6px 18px;font:500 13px/1.3 var(--mono);color:var(--ink-2)}
 .figs b{font:600 20px/1 var(--serif);color:var(--ink);font-variant-numeric:tabular-nums;display:block}
+.ctas{display:grid;gap:10px;grid-template-columns:repeat(2,minmax(0,280px))}
+.ctacard{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;padding:12px 14px}
+.ctacard .label{margin:0 0 4px}.ctacard p.small{margin:0 0 8px}
+.tiny{font-size:12px;margin:8px 0 0}
+@media (max-width:760px){.ctas{grid-template-columns:1fr;width:100%}}
 .layout{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
 @media (min-width:1000px){.layout{grid-template-columns:minmax(0,1fr) 400px}}
 .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
@@ -102,9 +107,22 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 <div class="top">
   <div>
     <h1>RecSys Atlas</h1>
-    <p class="tag">Twenty years of recommender-systems research on one map: filter it, see what grows and what fades, open the problems practitioners care about, and answer the questions we have for this year's authors.</p>
+    <p class="tag" style="margin-bottom:10px">Twenty years of recommender-systems research on one map: filter it, see what grows and what fades, open the problems practitioners care about, and answer the questions we have for this year's authors.</p>
+    <div class="figs" id="figs"></div>
   </div>
-  <div class="figs" id="figs"></div>
+  <div class="ctas">
+    <div class="ctacard">
+      <p class="label">Paper explorer</p>
+      <p class="small">Search 2,467 RecSys papers, open any paper, and get similar papers and recommendations that learn from what you read.</p>
+      <div class="row"><a class="btn" href="https://recsys-atlas-explore.vercel.app" target="_blank" rel="noopener">Explore papers</a><button class="au small" data-why="explore">Why use it?</button></div>
+    </div>
+    <div class="ctacard">
+      <p class="label">Atlas colab</p>
+      <p class="small">Discuss the open problems, tell us if your paper sits in the wrong region, and answer the questions we have for your work.</p>
+      <div class="row"><a class="btn" id="joinTop" href="#" target="_blank" rel="noopener">Join the colab</a><button class="au small" data-why="colab">Why join?</button></div>
+      <p class="tiny muted">Sign in with a GitHub account. No account? <a href="https://github.com/signup" target="_blank" rel="noopener">Create one free</a> in a minute.</p>
+    </div>
+  </div>
 </div>
 
 <div class="layout">
@@ -345,6 +363,29 @@ $('#panel').addEventListener('click', e => {
   if (b.dataset.p) openPaper(+b.dataset.p); else if (b.dataset.r) openRegion(+b.dataset.r); else if (b.dataset.t) openTopic(+b.dataset.t); else if (b.dataset.q) setQuery(b.dataset.q); else if (b.dataset.go) GO[b.dataset.go]();
 });
 const GO = { home: () => { $('#q').value = ''; F.q = ''; F.region = null; refresh(); home() }, find: () => $('#q').focus(), trends: () => trends('agent, LLM, group, fairness'), topics: () => topicsList(), join: () => joinForm() };
+const WHY = {
+  explore: { title: 'Why use the paper explorer', items: [
+    'Full-text search over twenty years of ACM RecSys papers, filtered by year.',
+    'Every paper page lists similar papers and what readers of that paper also opened, so related work is one click away.',
+    'The home feed learns from what you open: a live recommender you can watch adapt, running on the same field it studies.',
+    'Bookmarks keep your reading list; papers link back to the source and to their place on this map.'],
+    cta: ['Explore papers', 'https://recsys-atlas-explore.vercel.app'] },
+  colab: { title: 'Why join the Atlas colab', items: [
+    'Put your work in the right place: comment on your paper if the map put it in the wrong region, and point to what the region text misses.',
+    'Answer the three questions we drafted for each RecSys 2026 paper. Author answers decide which open problems the community takes up and how ready they are.',
+    'Debate 28 open problems from this year\'s industry papers with people who run recommenders in production.',
+    'Claim a missing dataset, benchmark or evaluation harness; contributions are credited on the problem and in releases.',
+    'Everything is versioned and attributed. Editors review changes to the shared text, and your comments stay yours.'],
+    cta: ['Join the colab', null] },
+};
+function why(k) {
+  const w = WHY[k], href = w.cta[1] || colab();
+  $('#pc').innerHTML = `<p class="label">${k === 'colab' ? 'Atlas colab' : 'Paper explorer'}</p><h2>${esc(w.title)}</h2><ul class="small">${w.items.map(x => `<li style="margin:6px 0">${esc(x)}</li>`).join('')}</ul>
+    <p><a class="btn" href="${href}" target="_blank" rel="noopener">${esc(w.cta[0])}</a></p>
+    ${k === 'colab' ? '<p class="small muted">You sign in with GitHub; the colab only reads your public profile name. No GitHub account? <a href="https://github.com/signup" target="_blank" rel="noopener">Create one free</a> (an e-mail address is enough), then come back and press Join.</p>' : ''}
+    <p><button class="btn sec" data-go="home">Back</button></p>`;
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-why]'); if (b) { why(b.dataset.why); if (innerWidth < 1000) $('#panel').scrollIntoView({ behavior: 'smooth' }) } });
 function home() {
   selPaper = selTopic = null; draw();
   $('#pc').innerHTML = `<p class="label">RecSys 2026 preview</p><h2>A shared map of what the field knows and what it should work on next</h2>
@@ -432,7 +473,7 @@ async function ask(p) {
   $('#ask').disabled = false;
 }
 function joinForm() {
-  if (!db) { $('#pc').innerHTML = `<p class="label">Join</p><h2>Help steer the field</h2><p class="small">Tell us your role, your areas and how you would like to help: answer questions about your papers, rate open problems from a production point of view, steward a region, build a dataset or benchmark, run autonomous research on well-defined problems, or use the Atlas in teaching.</p><a class="btn" href="${colab()}" target="_blank" rel="noopener">Join the Atlas colab</a><p class="small muted">Sign in with GitHub. The colab has four boards: open problems, questions for RecSys 2026 authors, regions with key papers (discuss any paper), and datasets, benchmarks and autoresearch.</p><p><button class="btn sec" data-go="home" style="margin-top:12px">Back</button></p>`; return }
+  if (!db) { $('#pc').innerHTML = `<p class="label">Join</p><h2>Help steer the field</h2><p class="small">Tell us your role, your areas and how you would like to help: answer questions about your papers, rate open problems from a production point of view, steward a region, build a dataset or benchmark, run autonomous research on well-defined problems, or use the Atlas in teaching.</p><a class="btn" href="${colab()}" target="_blank" rel="noopener">Join the Atlas colab</a> <button class="au small" data-why="colab">Why join?</button><p class="small muted">Sign in with a GitHub account (no account? <a href="https://github.com/signup" target="_blank" rel="noopener">create one free</a>). The colab has four boards: open problems, questions for RecSys 2026 authors, regions with key papers (discuss any paper), and datasets, benchmarks and autoresearch.</p><p><button class="btn sec" data-go="home" style="margin-top:12px">Back</button></p>`; return }
   $('#pc').innerHTML = `<p class="label">Join</p><h2>Help steer the field</h2><p class="small">Tell us as much as you like. We use it only to send you the right questions and a digest of progress in your areas.</p>
   <p class="label">You are mostly in</p><div class="row" id="roles">${['academia', 'industry', 'student', 'other'].map(r => `<button class="btn ${role === r ? '' : 'sec'}" data-role="${r}">${r}</button>`).join('')}</div>
   <p class="label" style="margin-top:10px">Your areas</p><input type="text" id="ar" placeholder="e.g. sequential recs, evaluation, news">
@@ -448,6 +489,7 @@ const narrow = () => innerWidth < 1000;
 $('#toPanel').onclick = () => { $('#toPanel').classList.remove('show'); $('#panel').scrollIntoView({ behavior: 'smooth', block: 'start' }) };
 $('#toMap').onclick = () => $('#mapbox').scrollIntoView({ behavior: 'smooth', block: 'start' });
 window.__hint = () => { if (narrow() && $('#panel').getBoundingClientRect().top > innerHeight * .8) $('#toPanel').classList.add('show') };
+$('#joinTop').href = colab();
 resize(); fit(); refresh(); home();
 (async () => {
   if (!window.claude?.use) return;

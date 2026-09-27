@@ -31,6 +31,16 @@ h1{font:600 clamp(32px,4.6vw,52px)/1 var(--serif);margin:0;letter-spacing:-.015e
 .ctacard .label{margin:0 0 4px}.ctacard p.small{margin:0 0 8px}
 .tiny{font-size:12px;margin:8px 0 0}
 @media (max-width:760px){.ctas{grid-template-columns:1fr;width:100%}}
+@media (min-width:1000px){
+ .top{display:grid;justify-items:center;text-align:center;gap:14px;padding-block:24px 16px}
+ .top .tag{margin-inline:auto;max-width:70ch;text-wrap:balance}
+ .figs{justify-content:center;gap:6px 28px}
+ .ctas{grid-template-columns:repeat(2,minmax(0,1fr));width:min(100%,1180px);text-align:left;gap:14px}
+ .ctacard{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 20px;align-items:center;padding:12px 16px}
+ .ctacard>*{grid-column:1}.ctacard p.small{margin:0}.ctacard .tiny{margin:4px 0 0}
+ .ctacard .row{grid-column:2;grid-row:1 / span 3;flex-direction:column;align-items:stretch;flex-wrap:nowrap}
+ .ctacard .row>*{text-align:center}
+}
 .layout{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
 @media (min-width:1000px){.layout{grid-template-columns:minmax(0,1fr) 400px}}
 .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}

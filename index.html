@@ -260,12 +260,13 @@ function draw() {
   }
   const subDraw = [];
   if (ST.length && (view.s >= 1.5 || F.region != null)) {
-    ctx.font = "italic 500 12.5px Newsreader, Georgia, serif";
+    const sfs = Math.round(Math.min(17, 12.5 + 2.2 * Math.sqrt(Math.max(0, view.s - 1))));
+    ctx.font = `italic 500 ${sfs}px Newsreader, Georgia, serif`;
     for (const [t, k] of ST.map((t, k) => [t, k]).sort((a, b) => (b[1] === F.st) - (a[1] === F.st) || b[0].n - a[0].n)) {
       if (hiddenGroups.has(t.g) || (F.region != null && t.r !== F.region)) continue;
-      const w = ctx.measureText(t.name).width, x = X(t.px), y = Y(t.py), bx = { x0: x - w / 2 - 2, x1: x + w / 2 + 2, y0: y - 8, y1: y + 8 };
+      const w = ctx.measureText(t.name).width, x = X(t.px), y = Y(t.py), bx = { x0: x - w / 2 - 2, x1: x + w / 2 + 2, y0: y - sfs * .65, y1: y + sfs * .65 };
       if (bx.x0 < 0 || bx.x1 > W || bx.y0 < 0 || bx.y1 > H || placed.some(q => over(q, bx))) continue;
-      placed.push(bx); subDraw.push([t, k, x, y]); labelBoxes.push({ id: t.r, st: k, ...bx });
+      placed.push(bx); subDraw.push([t, k, x, y, sfs]); labelBoxes.push({ id: t.r, st: k, ...bx });
     }
   }
   // paper titles when zoomed in: priority selected > 2026 > most cited; no overlaps with each other or region labels
@@ -286,8 +287,9 @@ function draw() {
     }
     ctx.textAlign = 'center';
   }
-  ctx.font = "italic 500 12.5px Newsreader, Georgia, serif"; ctx.textAlign = 'center';
-  for (const [t, k, x, y] of subDraw) {
+  ctx.textAlign = 'center';
+  for (const [t, k, x, y, sfs] of subDraw) {
+    ctx.font = `italic 500 ${sfs}px Newsreader, Georgia, serif`;
     ctx.globalAlpha = 1; ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.strokeStyle = COL.sheet; ctx.strokeText(t.name, x, y);
     ctx.fillStyle = k === F.st ? COL.accent : COL['ink-2']; ctx.fillText(t.name, x, y);
   }

@@ -132,7 +132,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 
 <footer>
   Papers: 2,212 ACM RecSys papers 2007–2025 (Semantic Scholar) and the 263 accepted for RecSys 2026 (recsys.acm.org). Regions: k-means over sentence embeddings of title and abstract, placed by similarity; names were assigned by hand from each region's keywords. Open problems and author questions are drafted by AI models from abstracts and not yet checked by people. Keyword trends match title, authors and abstract (abstracts available for about two thirds of the papers).
-  Paper details and recommendations: <a href="https://recsys-atlas-explore.vercel.app" target="_blank" rel="noopener">RecSys Atlas Explore</a> (powered by Recombee).
+  Discussion: <a href="https://recsys-atlas-colab.vercel.app/api/auth/github?next=%2Fcourse" target="_blank" rel="noopener">RecSys Atlas colab</a> (sign in with GitHub). Paper details and recommendations: <a href="https://recsys-atlas-explore.vercel.app" target="_blank" rel="noopener">RecSys Atlas Explore</a> (powered by Recombee).
   Initiated by Pavel Kordík (FIT CTU Prague &amp; Recombee). CC BY 4.0.
 </footer>
 
@@ -142,6 +142,9 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 const D = JSON.parse(document.getElementById('data').textContent);
 const EXPLORE = 'https://recsys-atlas-explore.vercel.app';
 const REPO = 'https://github.com/kordikp/atlas';
+const COLAB = 'https://recsys-atlas-colab.vercel.app';
+const colab = slug => `${COLAB}/api/auth/github?next=${encodeURIComponent(slug ? '/d/' + slug : '/course')}`;
+const BOARD = { problems: 'tini--atlas-open-problems--lecture-01', questions: 'tini--atlas-author-questions--lecture-02', regions: 'tini--atlas-regions--lecture-03', data: 'tini--atlas-datasets--lecture-04' };
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -375,6 +378,7 @@ function openRegion(id) {
     ${tps.length ? `<h3>Open problems here</h3><ul class="list">${tps.map(([t, j]) => `<li><span class="tagp">${esc(TP[j].readiness?.level)}</span> <button class="lk" data-t="${j}">${esc(TP[j].title)}</button></li>`).join('')}</ul>` : ''}
     <h3>Most cited</h3><ul class="list">${top.map(p => `<li><button class="lk" data-p="${p.i}">${esc(p.t)}</button><div class="small muted">${p.y} · ${p.c} citations</div></li>`).join('')}</ul>
     ${new26.length ? `<h3>New at RecSys 2026</h3><ul class="list">${new26.map(p => `<li><button class="lk" data-p="${p.i}">${esc(p.t)}</button><div class="small muted">${esc(p.tr)}</div></li>`).join('')}</ul>` : ''}
+    <p><a class="btn sec" href="${colab(BOARD.regions)}" target="_blank" rel="noopener">Discuss this region in the Atlas colab</a> <a class="btn sec" href="${colab(BOARD.data)}" target="_blank" rel="noopener">Datasets &amp; benchmarks</a></p>
     <p class="note">Closest topics in our taxonomy: ${esc([r.label, ...r.also].join(' · '))}. Region boundaries are machine-drafted; wrong neighbourhood? Tell us from the paper's panel.</p><button class="btn sec" data-go="home">Back</button>`;
 }
 function openTopic(j) {
@@ -385,7 +389,7 @@ function openTopic(j) {
   $('#pc').innerHTML = `<p class="label">Open problem · ${esc(r.level)} ${esc((LEV[r.level] || '').split(':')[0])} · AI research: ${esc(t.ai_research_ready?.verdict)}</p><h2>${esc(t.title)}</h2>
     <p>${esc(t.problem)}</p><div class="chips">${part('dataset')}${part('benchmark')}${part('eval_infrastructure')}${part('online_validation')}</div>
     <h3>Would this matter in production?</h3><p class="small"><b>${esc(t.question_for_practitioners)}</b></p>
-    ${db ? `<div class="row" id="tv"><button class="btn" data-v="matters">It matters</button><button class="btn sec" data-v="somewhat">Somewhat</button><button class="btn sec" data-v="not-really">Not really</button></div><textarea id="tvn" placeholder="What blocks it in your system? (optional)" style="margin-top:6px"></textarea>` : `<a class="btn" href="${voteUrl}" target="_blank" rel="noopener">Answer on GitHub</a>`}
+    ${db ? `<div class="row" id="tv"><button class="btn" data-v="matters">It matters</button><button class="btn sec" data-v="somewhat">Somewhat</button><button class="btn sec" data-v="not-really">Not really</button></div><textarea id="tvn" placeholder="What blocks it in your system? (optional)" style="margin-top:6px"></textarea>` : `<a class="btn" href="${colab(BOARD.problems)}" target="_blank" rel="noopener">Discuss in the Atlas colab</a>`}
     <h3>What is missing before anyone can solve it</h3><ul class="small">${(t.what_is_needed_next || []).map(a => `<li>${esc(a)}</li>`).join('')}</ul>
     <h3>Candidate approaches</h3><ul class="small">${(t.candidate_approaches || []).map(a => `<li>${esc(a)}</li>`).join('')}</ul>
     <h3>Industry signal (RecSys 2026)</h3><ul class="small">${(t.industry_signal || []).map(s => `<li><i>${esc(s.title)}</i> (${esc(s.track)}): ${esc(s.what_it_says)}</li>`).join('')}</ul>
@@ -408,7 +412,7 @@ function openPaper(i) {
     ${tps.length ? `<p class="small">Related open problem${tps.length > 1 ? 's' : ''}: ${tps.map(j => `<button class="au" data-t="${j}">${esc(TP[j].title)}</button>`).join(' · ')}</p>` : ''}
     <h3>Questions for the authors</h3><p class="small muted">${p.y === 2026 ? 'Drafted by an AI model from the abstract, to validate the record and help prioritise research.' : 'Help us keep the map current.'} Answer any, skip any.</p>
     ${qs.map((q, k) => `<div class="q"><p><span class="label">${esc(q.kind)}</span><br>${esc(q.q)}</p>${db ? `<textarea data-k="${k}" placeholder="Your answer (optional)"></textarea>` : ''}</div>`).join('')}
-    ${db ? `<div class="row"><button class="btn" id="sa">Save answers</button></div>` : `<a class="btn" href="${ansUrl}" target="_blank" rel="noopener">Answer on GitHub</a>`}
+    ${db ? `<div class="row"><button class="btn" id="sa">Save answers</button></div>` : `<a class="btn" href="${colab(p.y === 2026 ? BOARD.questions : BOARD.regions)}" target="_blank" rel="noopener">${p.y === 2026 ? 'Answer in the Atlas colab' : 'Discuss in the Atlas colab'}</a>`}
     ${sample ? `<h3>Does a frontier model know this paper?</h3><p class="small muted">A Claude model describes it from memory, with no search. You mark each statement.</p><button class="btn sec" id="ask">Ask the model</button><div id="ans"></div>` : ''}
     <p><button class="btn sec" data-go="home" style="margin-top:12px">Back</button></p>`;
   const sa = $('#sa'); if (sa) sa.onclick = async () => { const a = [...$('#pc').querySelectorAll('textarea[data-k]')].map((x, k) => ({ kind: qs[k].kind, q: qs[k].q, a: x.value.trim() })).filter(x => x.a); if (!a.length) return toast('Write at least one answer.'); const ok = await save('answers', { paper: p.t, year: p.y, answers: a }); toast(ok ? 'Saved. Thank you.' : 'Could not save.'); if (ok) sa.disabled = true };
@@ -428,7 +432,7 @@ async function ask(p) {
   $('#ask').disabled = false;
 }
 function joinForm() {
-  if (!db) { $('#pc').innerHTML = `<p class="label">Join</p><h2>Help steer the field</h2><p class="small">Tell us your role, your areas and how you would like to help: answer questions about your papers, rate open problems from a production point of view, steward a region, build a dataset or benchmark, run autonomous research on well-defined problems, or use the Atlas in teaching.</p><a class="btn" href="${issue('Join the RecSys Atlas', 'Role (academia / industry / student / other):\n\nAreas:\n\nI would like to (answer questions about my papers / rate open problems / steward a region / build a dataset, benchmark or harness / run autonomous research / teach):\n\nConflict of interest (company products you work on), if any:', 'join')}" target="_blank" rel="noopener">Join on GitHub</a><p><button class="btn sec" data-go="home" style="margin-top:12px">Back</button></p>`; return }
+  if (!db) { $('#pc').innerHTML = `<p class="label">Join</p><h2>Help steer the field</h2><p class="small">Tell us your role, your areas and how you would like to help: answer questions about your papers, rate open problems from a production point of view, steward a region, build a dataset or benchmark, run autonomous research on well-defined problems, or use the Atlas in teaching.</p><a class="btn" href="${colab()}" target="_blank" rel="noopener">Join the Atlas colab</a><p class="small muted">Sign in with GitHub. The colab has four boards: open problems, questions for RecSys 2026 authors, regions with key papers (discuss any paper), and datasets, benchmarks and autoresearch.</p><p><button class="btn sec" data-go="home" style="margin-top:12px">Back</button></p>`; return }
   $('#pc').innerHTML = `<p class="label">Join</p><h2>Help steer the field</h2><p class="small">Tell us as much as you like. We use it only to send you the right questions and a digest of progress in your areas.</p>
   <p class="label">You are mostly in</p><div class="row" id="roles">${['academia', 'industry', 'student', 'other'].map(r => `<button class="btn ${role === r ? '' : 'sec'}" data-role="${r}">${r}</button>`).join('')}</div>
   <p class="label" style="margin-top:10px">Your areas</p><input type="text" id="ar" placeholder="e.g. sequential recs, evaluation, news">

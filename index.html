@@ -270,7 +270,7 @@ function draw() {
     }
   }
   // paper titles when zoomed in: priority selected > 2026 > most cited; no overlaps with each other or region labels
-  if (view.s >= 2.2) {
+  if (view.s >= 4) {
     const cand = P.filter(p => !hiddenGroups.has(R[p.r].group) && (!M || M.has(p.i))).map(p => [p, X(p.px), Y(p.py)]).filter(([, x, y]) => x > -40 && x < W + 40 && y > 0 && y < H);
     cand.sort((a, b) => (b[0].i === selPaper) - (a[0].i === selPaper) || (b[0].y === 2026) - (a[0].y === 2026) || (b[0].c || 0) - (a[0].c || 0));
     ctx.font = "500 11.5px 'IBM Plex Sans', system-ui, sans-serif"; ctx.textBaseline = 'middle'; let shown = 0;

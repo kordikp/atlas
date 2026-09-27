@@ -169,7 +169,7 @@ const D = JSON.parse(document.getElementById('data').textContent);
 const EXPLORE = 'https://recsys-atlas-explore.vercel.app';
 const REPO = 'https://github.com/kordikp/atlas';
 const COLAB = 'https://recsys-atlas-colab.vercel.app';
-const colab = slug => `${COLAB}/api/auth/github?next=${encodeURIComponent(slug ? '/d/' + slug : '/course')}`;
+const colab = slug => `${COLAB}/api/auth/github?next=${encodeURIComponent(slug ? '/d/' + slug : '/boards')}`;
 const BOARD = { problems: 'tini--atlas-open-problems--lecture-01', data: 'tini--atlas-datasets--lecture-04' };
 const cont = g => g && g !== 'community' ? `tini--atlas-${g}--continent` : BOARD.problems;
 const $ = s => document.querySelector(s);

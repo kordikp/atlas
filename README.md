@@ -4,4 +4,4 @@ Twenty years of ACM RecSys research on one map: 2,212 papers 2007–2025 (Semant
 
 Live: https://kordikp.github.io/atlas/ · Paper details and recommendations: https://recsys-atlas-explore.vercel.app
 
-Open problems and author questions are drafted by AI models from abstracts and not yet checked by people. Initiated by Pavel Kordík (FIT CTU Prague); disclosure: co-founder of Recombee, recused from claims about vendors and from verifying his own papers. Content CC BY 4.0.
+Open problems and author questions are drafted by AI models from abstracts and not yet checked by people. Initiated by Pavel Kordík (FIT CTU Prague & Recombee). Content CC BY 4.0.
